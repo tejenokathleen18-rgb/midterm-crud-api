@@ -3,11 +3,12 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../config/data-source';
 import { Task } from '../entities/Task';
 import { User } from '../entities/User';
+import { Category } from '../entities/Category';
 
 
 const taskRepository = AppDataSource.getRepository(Task);
 const userRepository = AppDataSource.getRepository(User);
-
+const categoryRepository = AppDataSource.getRepository(Category);
 
 export class TaskController {
    // GET /api/users/:userId/tasks - Get all tasks for a user
@@ -59,7 +60,7 @@ export class TaskController {
        try {
            const userIdParam = Array.isArray(req.params.userId) ? req.params.userId[0] : req.params.userId;
            const userId = parseInt(userIdParam, 10);
-           const { title, description, status, priority, dueDate } = req.body;
+           const { title, description, status, priority, dueDate, categoryId } = req.body;
 
 
            if (isNaN(userId)) {
@@ -94,6 +95,16 @@ export class TaskController {
                    success: false,
                    error: { code: 'INVALID_PRIORITY', message: 'Invalid priority value' }
                });
+           }
+
+           if (categoryId !== undefined && categoryId !== null ) {
+            const category = await categoryRepository.findOne({ where: { id: Number(categoryId)}});
+            if (!category) {
+                return res.status(404).json({
+                    success: false,
+                    error: { code: 'CATEGORY_NOT_FOUND', message: 'Category not found'}
+                });
+             }
            }
 
 

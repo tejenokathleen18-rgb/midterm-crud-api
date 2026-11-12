@@ -6,10 +6,11 @@ import {
    UpdateDateColumn,
    ManyToOne,
    JoinColumn,
-   Index
+   Index,
+   OneToMany
 } from 'typeorm';
 import { User } from './User';
-
+import { Category } from './Category';
 
 @Entity('tasks')
 @Index(['userId'])
@@ -45,16 +46,25 @@ export class Task {
    @Column({ type: 'date', nullable: true })
    dueDate!: Date | null;
 
+   @ManyToOne(() => User, user => user.tasks, {onDelete: 'SET NULL', nullable: true})
+   @JoinColumn({ name: 'userId'})
+   user!: User | null;
 
-   // Many-to-One Relationship: Many tasks belong to one user
-   @ManyToOne(() => User, user => user.tasks, { onDelete: 'CASCADE' })
-   @JoinColumn({ name: 'userId' })
-   user!: User;
+   @Column({ nullable: true})
+   userId!: number | null;
 
+   @OneToMany(() => Task, (task) => task.user)
+   tasks!: Task[];
 
-   @Column({ type: 'int' })
-   userId!: number;
+   @ManyToOne (() => Category, (category) => category.tasks,{
+    nullable: true,
+    onDelete: "SET NULL",
+   })
+   @JoinColumn({ name: "categoryId"})
+   category!: Category | null;
 
+    @Column({ type: 'int', nullable: true  })
+    categoryId!: number | null;
 
    @CreateDateColumn()
    createdAt!: Date;

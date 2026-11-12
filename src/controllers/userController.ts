@@ -94,7 +94,7 @@ export class UserController {
 
   static async create(req: Request, res: Response) {
     try {
-      const { name, email, password } = req.body;
+      const { name, email, password, phoneNumber } = req.body;
 
      
       if (!name || !email || !password) {
@@ -123,7 +123,8 @@ export class UserController {
      const user = userRepository.create({
         name,
         email,
-        password
+        password,
+        phoneNumber
       });
       const savedUser = await userRepository.save(user);
 
